@@ -1,0 +1,141 @@
+{
+  "basics": {
+    "name": "SUNNY PATEL",
+    "title": "Software Engineer | Backend & Full-Stack Systems",
+    "phone": "+91-7989751340",
+    "email": "sunnyhaebak@gmail.com",
+    "linkedin": "linkedin.com/in/sunnyhaebak",
+    "github": "github.com/sunnyhaebak",
+    "leetcode": "leetcode.com/sunnyhaebak",
+    "location": "Hyderabad, India"
+  },
+  "summary": "Backend and Full-Stack Software Engineer with **18 months of production experience at Nielsen**, building enterprise microservices, REST APIs, event-driven pipelines, and cloud integrations. Experienced in distributed systems, high-traffic production environments, semantic search/RAG, and backend performance optimization.",
+  "skills": {
+    "backend_ai": [
+      "Node.js",
+      "NestJS",
+      "FastAPI",
+      "Spring Boot 3.2",
+      "REST APIs",
+      "RabbitMQ",
+      "WebSockets",
+      "Microservices",
+      "RAG",
+      "Semantic/Vector Search",
+      "Langfuse"
+    ],
+    "frontend": [
+      "React",
+      "Next.js",
+      "Redux Toolkit",
+      "HTML5",
+      "CSS3"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python",
+      "Java 21",
+      "C++",
+      "SQL"
+    ],
+    "cloud_data": [
+      "AWS (S3, EC2, Bedrock, OpenSearch, SDK v3)",
+      "GCP",
+      "Docker",
+      "Kubernetes",
+      "Nginx",
+      "PostgreSQL",
+      "MySQL",
+      "Redis"
+    ],
+    "practices": [
+      "Distributed Systems",
+      "Event-Driven Architecture",
+      "System Design (LLD/HLD)",
+      "API Design",
+      "DSA",
+      "CI/CD",
+      "OAuth 2.0/OIDC",
+      "RBAC",
+      "Agile/Scrum"
+    ]
+  },
+  "experience": [
+    {
+      "id": "exp-nielsen",
+      "company": "Nielsen",
+      "role": "Software Engineer -- Intern",
+      "duration": "March 2025 -- August 2026",
+      "location": "Hyderabad, India",
+      "bullets": [
+        "Developed and maintained **12+ REST APIs** (of 27+) for a multi-tenant audience analytics platform serving **15 global markets**, supporting audience workflows, RBAC, localized dashboards, and SSE tracking.",
+        "Migrated AWS S3 and SNS integrations from **SDK v2 to v3**; debugged large-file multipart upload failures by addressing SDK parameter requirements and UUID serialization/type-conversion issues.",
+        "Optimized high-frequency queries with **Redis caching**, reducing peak AWS CPU utilization from **60% to 22%**; resolved Redis Cluster CROSSSLOT errors by restructuring key patterns for cluster-compatible operations.",
+        "Built semantic search and **RAG** for QBAB using **Amazon OpenSearch** and **Titan v2 embeddings**, enabling retrieval across **226.4 million** audience records; implemented index backup and restoration workflows.",
+        "Developed a self-service **React Admin Console** with backend APIs, enabling tenant leads to manage team access independently and eliminating manual Jira access requests.",
+        "Co-engineered an **MCP server** with **10+ Zod-validated tools** over HTTP streaming; integrated **Langfuse** for tracing, latency, and token-cost monitoring, reducing LLM token consumption by approximately **33%**.",
+        "Built asynchronous **FastAPI** workers processing **10K+ daily jobs** through RabbitMQ and Trino to S3; strengthened unit and integration testing with **Jest and Cypress** for weekly releases.",
+        "Maintained **99.95% production uptime** in high-traffic environments by architecting health checks, distributed tracing, and automated failover recovery across microservices."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-company-clone",
+      "name": "Hyper-Local On-Demand Logistics & Delivery Dispatch Platform",
+      "tech_stack": "Go, NestJS, PostgreSQL, Redis Cluster, RabbitMQ, WebSockets, Docker",
+      "link": "github.com/sunnyhaebak",
+      "bullets": [
+        "Engineered high-concurrency order dispatching and geospatial driver routing engine handling **15,000+ peak orders/hour** with sub-50ms dispatch latency.",
+        "Designed idempotent order state machine with **Redis distributed locks** and **RabbitMQ event streaming**, preventing duplicate transactions across erratic mobile networks."
+      ]
+    },
+    {
+      "id": "proj-telemed",
+      "name": "Telemedicine & Patient Consultation Platform",
+      "tech_stack": "NestJS, Next.js, PostgreSQL, Redis, Socket.IO, AWS S3",
+      "link": "github.com/sunnyhaebak",
+      "bullets": [
+        "Built a healthcare platform for consultation passes, doctor appointments, and outpatient queue management.",
+        "Engineered concurrency-safe booking using database transactions and caching; implemented real-time **Socket.IO** chat, session guards, and secure report sharing via time-limited **S3 pre-signed URLs**."
+      ]
+    },
+    {
+      "id": "proj-field-service",
+      "name": "Field-Service Management Platform (ATI Motors Contract)",
+      "tech_stack": "React, Node.js, PostgreSQL, JWT, AWS EC2",
+      "link": "github.com/sunnyhaebak",
+      "bullets": [
+        "Delivered a B2B field-service platform for **50 technicians**, featuring role-based dashboards, JWT authentication, GPS-geofenced attendance, and state-machine ticket workflows.",
+        "Achieved **95% on-time ticket resolution** through idempotent ERP sync and exponential-backoff retries; deployed on AWS EC2 with Nginx and zero-downtime releases."
+      ]
+    },
+    {
+      "id": "proj-ai-agent",
+      "name": "AI Agent Platform",
+      "tech_stack": "FastAPI, PostgreSQL, Redis, GPT-4, Docker",
+      "link": "github.com/sunnyhaebak",
+      "bullets": [
+        "Built a ReAct-based agent backend with a tool registry, JSON-schema validation, **3-tier RBAC**, Redis conversation memory, and PostgreSQL audit trails.",
+        "Implemented SQL-injection/shell-command guardrails and PII output redaction for secure AI interactions."
+      ]
+    }
+  ],
+  "achievements": [
+    "**Smart India Hackathon Finalist** -- led architecture for a national healthcare platform with tri-role dashboards (6-member team), Sep 2024.",
+    "**Atlassian Certified in Cloud Fundamentals** -- official cloud and collaboration platform credential, Sep 2026.",
+    "**Software Testing and Automation Specialization** -- University of Minnesota (Coursera); Selenium-based web/mobile testing, Jul 2026.",
+    "**1st Runner-Up, Datathon (Pickl.AI & TansOrg)** -- developed a loan-approval ML model achieving **92% accuracy** using Python and scikit-learn, Apr 2024."
+  ],
+  "education": [
+    {
+      "institution": "Lovely Professional University",
+      "degree": "Bachelor of Technology -- Computer Science & Engineering | CGPA: 8.27",
+      "gpa": "8.27",
+      "graduation_date": "October 2022 -- August 2026",
+      "location": "Punjab, India",
+      "coursework": "Object-Oriented Programming, Data Structures & Algorithms, Operating Systems, Computer Networks, Database Management Systems"
+    }
+  ]
+}

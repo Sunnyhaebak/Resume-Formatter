@@ -1,0 +1,11 @@
+{
+  "name": "resume-tailor-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-Powered LaTeX Resume Tailoring Engine (Desktop + Mobile PWA)",
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "test:backend": "pytest backend/tests/test_pipeline.py -v"
+  }
+}

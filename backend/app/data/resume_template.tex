@@ -1,0 +1,195 @@
+\documentclass[10pt, letterpaper]{article}
+
+\usepackage[top=0.27in, bottom=0.25in, left=0.42in, right=0.42in]{geometry}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
+
+% ==================== COLORS ====================
+
+\definecolor{navyDark}{HTML}{0F2442}
+\definecolor{royalBlue}{HTML}{1D4E89}
+\definecolor{bodyDark}{HTML}{1A1A1A}
+\definecolor{subItalic}{HTML}{2D3748}
+\definecolor{techGray}{HTML}{374151}
+\definecolor{pipeGray}{HTML}{666666}
+
+% ==================== GLOBAL SETTINGS ====================
+
+\pagestyle{empty}
+\raggedright
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\color{bodyDark}
+
+% ==================== SECTION HEADINGS ====================
+
+\titleformat{\section}
+  {\fontsize{9.5}{11.0}\selectfont\bfseries\color{navyDark}}
+  {}{0em}{}
+  [\vspace{-5.8pt}\color{navyDark}\rule{\linewidth}{0.8pt}]
+
+\titlespacing*{\section}{0pt}{5.2pt}{3.0pt}
+
+% ==================== BULLET SETTINGS ====================
+
+\setlist[itemize]{
+  leftmargin=0.13in,
+  labelsep=0.08in,
+  label=\textcolor{royalBlue}{\fontsize{4.8}{4.8}\selectfont$\bullet$},
+  itemsep=0.8pt,
+  parsep=0pt,
+  topsep=0.9pt,
+  partopsep=0pt
+}
+
+\begin{document}
+
+% ==================== 1. HEADER ====================
+
+{\fontsize{17.6}{19.2}\selectfont\bfseries\color{navyDark} << basics.name >>} \\[1.5pt]
+
+{\fontsize{9.5}{11.0}\selectfont\color{royalBlue}
+<< basics.title | replace('|', '$\\bullet$') >>} \\[1.7pt]
+
+{\fontsize{8.5}{10.0}\selectfont
+  \href{mailto:<< basics.email >>}{\color{royalBlue}<< basics.email >>}\textcolor{pipeGray}{\hspace{4pt}$|$\hspace{4pt}}%
+  \color{bodyDark}<< basics.phone >>\textcolor{pipeGray}{\hspace{4pt}$|$\hspace{4pt}}%
+  \href{https://<< basics.linkedin >>}{\color{royalBlue}LinkedIn}\textcolor{pipeGray}{\hspace{4pt}$|$\hspace{4pt}}%
+  \href{https://<< basics.github >>}{\color{royalBlue}GitHub}%
+  <% if basics.leetcode %>\textcolor{pipeGray}{\hspace{4pt}$|$\hspace{4pt}}\href{https://<< basics.leetcode >>}{\color{royalBlue}LeetCode}<% endif %>
+} \\[-4.2pt]
+
+{\color{navyDark}\rule{\linewidth}{1.3pt}}
+\vspace{-1.5pt}
+
+% ==================== 2. SUMMARY ====================
+<% if summary %>
+\section*{SUMMARY}
+
+{\fontsize{8.7}{10.2}\selectfont\color{bodyDark}
+<< summary >>
+}
+<% endif %>
+
+% ==================== 3. TECHNICAL SKILLS ====================
+
+\section*{TECHNICAL SKILLS}
+
+\hspace*{0.13in}\begin{minipage}{\dimexpr\linewidth-0.13in\relax}
+{\fontsize{8.5}{9.9}\selectfont
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.0}
+
+\begin{tabularx}{\linewidth}{@{}p{1.05in} X@{}}
+
+  \textbf{Backend \& AI} &
+  << skills.backend_ai | join(', ') >> \\[0.5pt]
+
+  \textbf{Frontend} &
+  << skills.frontend | join(', ') >> \\[0.5pt]
+
+  \textbf{Languages} &
+  << skills.languages | join(', ') >> \\[0.5pt]
+
+  \textbf{Cloud \& Data} &
+  << skills.cloud_data | join(', ') >> \\[0.5pt]
+
+  \textbf{Practices} &
+  << skills.practices | join(', ') >> \\
+
+\end{tabularx}
+}
+\end{minipage}
+
+% ==================== 4. EXPERIENCE ====================
+
+\section*{EXPERIENCE}
+
+<% for exp in experience %>
+\noindent
+\begin{tabular*}{\linewidth}{@{}l@{\extracolsep{\fill}}r@{}}
+{\fontsize{9.0}{9.8}\selectfont\textbf{<< exp.company >>}} &
+{\fontsize{9.0}{9.8}\selectfont\textbf{<< exp.location >>}} \\[-2.5pt]
+
+{\fontsize{8.6}{9.5}\selectfont\textit{\color{subItalic}<< exp.role >>}} &
+{\fontsize{8.6}{9.5}\selectfont\textit{\color{subItalic}<< exp.duration >>}}
+\end{tabular*}
+
+\vspace{-2pt}
+
+\begin{itemize}\fontsize{8.7}{10.2}\selectfont
+  <% for bullet in exp.bullets %>
+  \item << bullet >>
+  <% endfor %>
+\end{itemize}
+
+\vspace{0.7pt}
+<% endfor %>
+
+% ==================== 5. PROJECTS ====================
+
+\section*{PROJECTS}
+
+<% for proj in projects %>
+{\fontsize{8.9}{10.0}\selectfont\textbf{<< proj.name >>}}
+{\fontsize{8.3}{9.5}\selectfont\textcolor{pipeGray}{$|$}
+\textbf{\color{techGray}<< proj.tech_stack >>}}
+
+\begin{itemize}\fontsize{8.6}{10.1}\selectfont
+  <% for bullet in proj.bullets %>
+  \item << bullet >>
+  <% endfor %>
+\end{itemize}
+
+\vspace{0.7pt}
+<% endfor %>
+
+% ==================== 6. ACHIEVEMENTS ====================
+<% if achievements %>
+\section*{ACHIEVEMENTS \& CERTIFICATIONS}
+
+\begin{itemize}\fontsize{8.6}{10.0}\selectfont
+  <% for ach in achievements %>
+  \item << ach >>
+  <% endfor %>
+\end{itemize}
+
+\vspace{0pt}
+<% endif %>
+
+% ==================== 7. EDUCATION ====================
+
+\section*{EDUCATION}
+
+<% for edu in education %>
+\noindent
+\begin{tabular*}{\linewidth}{@{}l@{\extracolsep{\fill}}r@{}}
+
+{\fontsize{9.0}{9.8}\selectfont\textbf{<< edu.institution >>}} &
+{\fontsize{9.0}{9.8}\selectfont\textbf{<< edu.location >>}} \\[-2pt]
+
+{\fontsize{8.6}{9.5}\selectfont
+\textit{\color{subItalic}<< edu.degree >>}} &
+{\fontsize{8.6}{9.5}\selectfont
+\textit{\color{subItalic}<< edu.graduation_date >>}}
+
+\end{tabular*}
+
+<% if edu.coursework %>
+\vspace{1pt}
+
+{\fontsize{8.3}{9.7}\selectfont
+\textit{\color{techGray}Relevant Coursework:}
+<< edu.coursework >>
+}
+<% endif %>
+<% endfor %>
+
+\end{document}
