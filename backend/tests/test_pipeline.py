@@ -25,7 +25,11 @@ from app.latex_service import (
     compile_latex_to_pdf,
     verify_page_count,
 )
-from app.llm_service import get_mock_tailored_response, tailor_resume_with_gemini
+from app.llm_service import (
+    _enforce_response_contract,
+    get_mock_tailored_response,
+    tailor_resume_with_gemini,
+)
 
 
 def test_latex_special_character_escaping():
@@ -257,7 +261,33 @@ def test_mock_tailoring_ranks_spring_project_from_verified_catalog():
         "Java 21 Spring Boot backend engineer requiring CRM, JWT, RBAC, and microservices.",
     )
 
-    assert result.tailored_resume.projects[0].name == "Multi-Tenant SaaS CRM"
+    assert result.tailored_resume.projects[0].name.endswith("(Proposed Concept)")
+    assert result.tailored_resume.projects[1].name == "Multi-Tenant SaaS CRM"
+    assert result.tailored_resume.projects[1].link.startswith("https://github.com/Sunnyhaebak/")
+
+
+def test_gemini_contract_keeps_proposed_project_and_verified_github_projects():
+    master = load_default_master_resume()
+    job_description = "Java 21 Spring Boot role requiring CRM, JWT, RBAC, and microservices."
+    response = get_mock_tailored_response(master, job_description)
+    response.tailored_resume.projects[0] = ProjectItem(
+        id="invented",
+        name="Completed Payment Platform",
+        tech_stack="Java, Spring Boot",
+        link="github.com/not-verified",
+        bullets=["Built a payment platform processing 99% of transactions."],
+    )
+    response.tailored_resume.summary = master.summary
+
+    result = _enforce_response_contract(response, master, job_description)
+
+    assert result.tailored_resume.projects[0].name.endswith("(Proposed Concept)")
+    assert all(
+        project.link.startswith("https://github.com/Sunnyhaebak/")
+        for project in result.tailored_resume.projects[1:]
+    )
+    assert result.tailored_resume.summary != master.summary
+    assert "Java 21" in result.tailored_resume.summary
 
 
 def test_mock_tailoring_limits_nielsen_to_five_jd_matched_bullets():

@@ -98,11 +98,14 @@ class DiffItem(BaseModel):
 
 class TailoredResume(BaseModel):
     basics: Basics
-    summary: Optional[str] = Field(default=None, description="Tailored professional summary")
+    summary: Optional[str] = Field(
+        default=None,
+        description="Professional summary rewritten for the target JD using only verified candidate facts and skills",
+    )
     skills: Skills
     experience: List[ExperienceItem]
     projects: List[ProjectItem] = Field(
-        description="Top 2-3 most relevant projects only to keep resume within 1 page"
+        description="Exactly three projects: first a clearly labeled JD-specific proposed concept, followed by two distinct verified GitHub projects ranked by JD relevance",
     )
     achievements: Optional[List[str]] = Field(default_factory=list)
     education: List[Education]

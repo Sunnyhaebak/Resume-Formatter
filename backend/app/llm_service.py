@@ -36,16 +36,18 @@ CRITICAL RULES:
 1. ZERO FABRICATION:
    - You MUST NOT invent fictional companies, job titles, start/end dates, or fake degrees.
    - You may only use facts, experience, projects, and skills that exist in the Master Resume, with truthful reframing of architectural concepts.
+    - Project 1 is the sole exception: it is a clearly labeled proposed concept, not candidate work history, and must not claim completion or fabricated outcomes.
 2. EXPERIENCE (NIELSEN) - 5 TO 8 JD-MATCHED BULLETS:
-   - Nielsen MUST contain at least 5 bullet points and at most 8, matching the Master Resume bullet supply.
-   - Start with 5 of the strongest bullets. Use 6 to 8 only when each extra point is explicitly relevant to the JD and still fits one page.
+    - Nielsen MUST contain at least 5 bullet points and at most the number supplied by the Master Resume (currently 8).
+    - Prefer 5. Use additional source-supported bullets up to 8 when the JD makes them relevant and the page still fits.
    - Select and reorder bullets from the Master Resume to match the target JD; remove weaker or less relevant points instead of inventing facts.
    - Rewrite each retained bullet truthfully around the JD's required technologies, impact metrics, and responsibilities.
    - Enhance and reframe the phrasing with high-impact keywords (e.g., high-traffic production scale, 99.95% uptime, API throughput, Redis caching, distributed microservices) to deeply impress HR and hiring managers.
-3. PROJECTS - STRICTLY 3 VERIFIED GITHUB PROJECTS IN JD-RANKED ORDER:
-   - Select Project 1 as the strongest repository match to the target company's core requirement; do not invent repositories or metrics.
-   - Select Project 2 and Project 3 from the remaining verified GitHub project catalog, ranked by technology and domain overlap with the JD.
-   - Preserve the repository names, technology stacks, and truthful repository links from the Master Resume.
+3. PROJECTS - STRICTLY 3 PROJECTS:
+    - Project 1 is an AI-generated, JD-specific proposed project concept designed to demonstrate alignment with the target company's requirements.
+    - Clearly label Project 1 as a proposed concept. Never imply it has already been built, shipped, or used professionally; do not invent metrics or outcomes.
+    - Use only technologies present in the verified Master Resume skills/project catalog.
+    - Projects 2 and 3 MUST be selected from distinct verified GitHub repositories in the Master Resume, ranked by JD relevance, with their original repository links.
 4. TECHNICAL SKILLS:
    - Reorder the technologies in Backend & AI, Languages, and Cloud & Data so that the skills matching the target JD appear first in each category.
 5. STRICT 1-PAGE SPACE BUDGET:
@@ -62,11 +64,12 @@ def get_mock_tailored_response(
 ) -> TailoredResumeResponse:
     """
     Deterministic tailoring engine tailored for Sunny Patel:
-    1. Generates Project 1 matching the company requirements (e.g. high-traffic platform).
+    1. Creates a clearly labeled proposed Project 1 concept tailored to the JD.
     2. Ranks verified GitHub projects 2 and 3 by the target JD.
-    3. Selects and reframes up to five Nielsen bullets with the strongest JD alignment.
+    3. Selects five to eight Nielsen bullets with the strongest JD alignment.
     """
     jd_lower = job_description.lower()
+    jd_terms = _job_terms(job_description)
     diffs: list[DiffItem] = []
 
     # 1. Reorder Languages
@@ -115,7 +118,6 @@ def get_mock_tailored_response(
         raw_bullets = list(exp.bullets)
 
         # Rank bullets by direct overlap with the target JD while preserving source wording.
-        jd_terms = {term for term in re.findall(r"[a-zA-Z][a-zA-Z0-9+.-]{2,}", jd_lower)}
         sorted_bullets = sorted(
             raw_bullets,
             key=lambda bullet: sum(term in bullet.lower() for term in jd_terms),
@@ -125,7 +127,6 @@ def get_mock_tailored_response(
         # Keep at least five points; use up to eight only when the extra bullets match the JD.
         relevant_bullets = [bullet for bullet in sorted_bullets if sum(term in bullet.lower() for term in jd_terms) > 0]
         final_count = min(len(exp.bullets), max(5, min(8, len(relevant_bullets))))
-        final_count = max(5, final_count)
         final_8_bullets = sorted_bullets[:final_count]
 
         tailored_experiences.append(
@@ -149,23 +150,18 @@ def get_mock_tailored_response(
             )
         )
 
-    # 4. Projects: rank all verified GitHub repositories deterministically against the JD.
-    verified_projects = list(master_resume.projects)
-
-    def project_score(project: ProjectItem) -> int:
-        searchable = f"{project.name} {project.tech_stack} {' '.join(project.bullets)}".lower()
-        return sum(1 for term in jd_terms if term in searchable)
-
-    ranked_projects = sorted(verified_projects, key=project_score, reverse=True)
-    final_projects = ranked_projects[:3]
+    # Project 1 is a proposed concept; only Projects 2 and 3 imply completed work.
+    project_1 = _make_proposed_project(master_resume, job_description)
+    ranked_projects = _rank_verified_projects(master_resume, jd_terms)
+    final_projects = [project_1, *ranked_projects[:2]]
 
     diffs.append(
         DiffItem(
             category="Projects",
-            item_name="Project 1 (Highest JD-Relevance Repository)",
-            original="Unranked GitHub project catalog",
-            tailored=f"{final_projects[0].name} ({final_projects[0].tech_stack})",
-            reason=f"Project 1 was selected because it has the strongest verified GitHub technology and domain overlap with the JD: {final_projects[0].tech_stack}."
+            item_name="Project 1 (AI-Generated Proposed Concept)",
+            original="No proposed concept",
+            tailored=f"{project_1.name} ({project_1.tech_stack})",
+            reason=f"Generated as a clearly labeled proposed concept to align with the JD's requirements. Its technology stack is limited to verified skills: {project_1.tech_stack}. It is not represented as completed work."
         )
     )
     diffs.append(
@@ -174,7 +170,7 @@ def get_mock_tailored_response(
             item_name="Project 2 & 3 JD-Ranked Portfolio Selection",
             original="Unranked GitHub project catalog",
             tailored=" | ".join(project.name for project in final_projects[1:3]),
-            reason="Ranked the remaining owned GitHub repositories by technology and domain overlap with the target JD."
+            reason="Selected these two completed projects from the verified GitHub catalog and ranked them by technology and domain overlap with the target JD."
         )
     )
 
@@ -186,13 +182,7 @@ def get_mock_tailored_response(
         practices=master_resume.skills.practices,
     )
 
-    tailored_summary = master_resume.summary
-    if "rag" in jd_lower or "semantic" in jd_lower or "open search" in jd_lower:
-        tailored_summary = "Backend and Full-Stack Software Engineer with **18 months of production experience at Nielsen**, specializing in distributed microservices, REST APIs, event-driven pipelines, and production RAG integrations. Experienced in semantic/vector search, Amazon OpenSearch, Redis performance optimization, and cloud-backed scalable systems."
-    elif "frontend" in jd_lower or "react" in jd_lower:
-        tailored_summary = "Backend and Full-Stack Software Engineer with **18 months of production experience at Nielsen**, building React applications, REST APIs, enterprise microservices, Redis integrations, and distributed cloud services. Experienced in self-service dashboards, real-time communication, RBAC, and production full-stack delivery."
-    elif "java" in jd_lower or "spring" in jd_lower:
-        tailored_summary = "Backend and Full-Stack Software Engineer with **18 months of production experience at Nielsen**, building enterprise microservices, REST APIs, event-driven systems, Redis caching, and cloud integrations. Experienced in distributed Java-adjacent systems, Spring-ready API design, production resilience, and scalable backend architecture."
+    tailored_summary = _make_jd_summary(master_resume, jd_terms)
 
     tailored_resume = TailoredResume(
         basics=master_resume.basics,
@@ -204,10 +194,190 @@ def get_mock_tailored_response(
         education=master_resume.education,
     )
 
+    diffs.append(
+        DiffItem(
+            category="Summary",
+            item_name="JD-Tailored Professional Summary",
+            original=master_resume.summary or "No summary",
+            tailored=tailored_summary or "",
+            reason="Prioritized verified skills and experience with the strongest direct overlap with the target job description.",
+        )
+    )
+
     return TailoredResumeResponse(
         tailored_resume=tailored_resume,
         changes_summary=diffs
     )
+
+
+def _job_terms(job_description: str) -> set[str]:
+    stop_words = {"and", "the", "for", "with", "from", "you", "your", "are", "our", "this", "that", "will", "have", "has", "who", "what", "about", "into", "years", "year", "role", "team", "work", "job", "experience", "engineer", "developer", "senior", "junior"}
+    return {
+        term.lower()
+        for term in re.findall(r"[A-Za-z][A-Za-z0-9+.#/-]{1,}", job_description)
+        if term.lower() not in stop_words
+    }
+
+
+def _rank_verified_projects(master_resume: MasterResume, jd_terms: set[str]) -> list[ProjectItem]:
+    def score(project: ProjectItem) -> int:
+        text = f"{project.name} {project.tech_stack} {' '.join(project.bullets)}".lower()
+        return sum(term in text for term in jd_terms)
+
+    return sorted(master_resume.projects, key=score, reverse=True)
+
+
+def _make_proposed_project(master_resume: MasterResume, job_description: str) -> ProjectItem:
+    jd_lower = job_description.lower()
+    if any(term in jd_lower for term in ("payment", "fintech", "banking", "payout")):
+        domain = "Payment Reconciliation and Risk Operations"
+        purpose = "payment processing, reconciliation, and failure recovery"
+    elif any(term in jd_lower for term in ("health", "medical", "patient", "clinical")):
+        domain = "Connected Care Coordination"
+        purpose = "patient workflows, appointment coordination, and secure communication"
+    elif any(term in jd_lower for term in ("logistics", "delivery", "fleet", "dispatch")):
+        domain = "Fleet Dispatch and Operations"
+        purpose = "dispatch orchestration, live fleet status, and resilient event processing"
+    elif any(term in jd_lower for term in ("ai", "llm", "rag", "machine learning", "search")):
+        domain = "Enterprise AI Knowledge Assistant"
+        purpose = "grounded retrieval, controlled tool execution, and auditable AI workflows"
+    else:
+        domain = "Enterprise Workflow Automation"
+        purpose = "the role's stated workflows, integrations, and operational requirements"
+
+    known_technologies = {
+        skill
+        for group in (
+            master_resume.skills.backend_ai,
+            master_resume.skills.frontend,
+            master_resume.skills.languages,
+            master_resume.skills.cloud_data,
+        )
+        for skill in group
+        if skill.lower() in jd_lower
+    }
+    if len(known_technologies) < 3:
+        known_technologies.update(master_resume.skills.backend_ai[:3])
+    tech_stack = ", ".join(sorted(known_technologies)[:6])
+
+    return ProjectItem(
+        id="proj-jd-concept",
+        name=f"{domain} (Proposed Concept)",
+        tech_stack=tech_stack,
+        link="",
+        bullets=[
+            f"Proposed a JD-aligned system concept for {purpose}; this is a design proposal, not a claim of completed work.",
+            f"Outlined an architecture using verified candidate technologies: {tech_stack}.",
+        ],
+    )
+
+
+def _make_jd_summary(master_resume: MasterResume, jd_terms: set[str]) -> str:
+    intro = (master_resume.summary or "Backend and Full-Stack Software Engineer.").split(". ", 1)[0].rstrip(".")
+    available_skills = (
+        master_resume.skills.backend_ai
+        + master_resume.skills.languages
+        + master_resume.skills.cloud_data
+        + master_resume.skills.frontend
+    )
+    matched_skills = [skill for skill in available_skills if any(term in skill.lower() or skill.lower() in term for term in jd_terms)]
+    if not matched_skills:
+        matched_skills = master_resume.skills.backend_ai[:3]
+    selected = matched_skills[:5]
+    highlighted = ", ".join(f"**{skill}**" for skill in selected)
+    return f"{intro}. Relevant verified strengths for this role include {highlighted}."
+
+
+def _enforce_response_contract(
+    response: TailoredResumeResponse,
+    master_resume: MasterResume,
+    job_description: str,
+) -> TailoredResumeResponse:
+    jd_terms = _job_terms(job_description)
+    original_experience = {item.id: item for item in master_resume.experience}
+
+    for experience in response.tailored_resume.experience:
+        source = original_experience.get(experience.id)
+        if not source:
+            continue
+        ranked_source = sorted(
+            source.bullets,
+            key=lambda bullet: sum(term in bullet.lower() for term in jd_terms),
+            reverse=True,
+        )
+        minimum = min(5, len(source.bullets))
+        maximum = min(8, len(source.bullets))
+        bullets = list(experience.bullets[:maximum])
+        for source_bullet in ranked_source:
+            if len(bullets) >= minimum:
+                break
+            if source_bullet not in bullets:
+                bullets.append(source_bullet)
+        experience.bullets = bullets
+
+    proposed_project = response.tailored_resume.projects[0] if response.tailored_resume.projects else None
+    fallback_concept = _make_proposed_project(master_resume, job_description)
+    if proposed_project:
+        claim_text = " ".join(proposed_project.bullets)
+        verified_technologies = (
+            master_resume.skills.backend_ai
+            + master_resume.skills.frontend
+            + master_resume.skills.languages
+            + master_resume.skills.cloud_data
+            + [project.tech_stack for project in master_resume.projects]
+        )
+        unknown_stack_item = any(
+            not any(technology.lower() in item.strip().lower() or item.strip().lower() in technology.lower() for technology in verified_technologies)
+            for item in proposed_project.tech_stack.split(",")
+            if item.strip()
+        )
+        if (
+            re.search(r"\b(built|implemented|deployed|achieved|processed|reduced|increased)\b|\d", claim_text, re.I)
+            or unknown_stack_item
+        ):
+            proposed_project = fallback_concept
+        else:
+            proposed_project.id = "proj-jd-concept"
+            if "proposed concept" not in proposed_project.name.lower():
+                proposed_project.name = f"{proposed_project.name} (Proposed Concept)"
+            proposed_project.link = ""
+    else:
+        proposed_project = fallback_concept
+
+    ranked_repositories = _rank_verified_projects(master_resume, jd_terms)
+    response.tailored_resume.projects = [proposed_project, *ranked_repositories[:2]]
+
+    if not response.tailored_resume.summary or response.tailored_resume.summary == master_resume.summary:
+        response.tailored_resume.summary = _make_jd_summary(master_resume, jd_terms)
+
+    response.changes_summary = [
+        item for item in response.changes_summary
+        if not (item.category.lower() == "projects" or item.category.lower() == "summary")
+    ]
+    response.changes_summary.extend([
+        DiffItem(
+            category="Projects",
+            item_name="Project 1 (AI-Generated Proposed Concept)",
+            original="No proposed concept",
+            tailored=f"{proposed_project.name} ({proposed_project.tech_stack})",
+            reason="Generated to demonstrate a solution concept aligned to this JD. It is explicitly marked as proposed, uses verified technologies, and is not represented as completed work.",
+        ),
+        DiffItem(
+            category="Projects",
+            item_name="Projects 2 & 3 (Verified GitHub Repositories)",
+            original="Full verified GitHub project catalog",
+            tailored=" | ".join(project.name for project in ranked_repositories[:2]),
+            reason="Selected and ranked from owned GitHub repositories by overlap with the target JD.",
+        ),
+        DiffItem(
+            category="Summary",
+            item_name="JD-Tailored Professional Summary",
+            original=master_resume.summary or "No summary",
+            tailored=response.tailored_resume.summary or "",
+            reason="Rewritten to prioritize verified skills and experience that overlap with the job description.",
+        ),
+    ])
+    return response
 
 
 def tailor_resume_with_gemini(
@@ -247,14 +417,20 @@ def tailor_resume_with_gemini(
                 f"Overflow retry: reduce the summary and bullet wording by approximately {trim_percentage}% compared with a standard tailoring pass. Preserve all verified facts, key metrics, and required sections."
             )
 
+        resume_payload = master_resume.model_dump()
+        resume_payload["projects"] = [
+            project.model_dump()
+            for project in _rank_verified_projects(master_resume, _job_terms(job_description))[:3]
+        ]
+
         prompt_payload = {
             "target_job_description": job_description,
             "custom_instructions": custom_instructions or "None provided. Tailor strictly to JD.",
             "rules": rules,
-            "verified_master_resume": master_resume.model_dump(),
+            "verified_master_resume": resume_payload,
         }
 
-        user_content = json.dumps(prompt_payload, indent=2)
+        user_content = json.dumps(prompt_payload, separators=(",", ":"), ensure_ascii=True)
 
         for model_index, model in enumerate(GEMINI_MODEL_CHAIN):
             for attempt in range(2):
@@ -282,6 +458,11 @@ def tailor_resume_with_gemini(
                         raise ValueError("Empty response received from Gemini.")
 
                     tailored_res = TailoredResumeResponse.model_validate_json(response.text)
+                    tailored_res = _enforce_response_contract(
+                        tailored_res,
+                        master_resume,
+                        job_description,
+                    )
                     logger.info("Gemini request succeeded with model %s.", model)
                     return tailored_res
                 except Exception as e:
