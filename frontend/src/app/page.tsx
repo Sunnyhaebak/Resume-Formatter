@@ -91,6 +91,9 @@ function ResumeTailorDashboard() {
   const [latexSource, setLatexSource] = useState<string | null>(null);
   const [tailoredData, setTailoredData] = useState<TailoredResume | null>(null);
   const [downloadFilename, setDownloadFilename] = useState("Sunny_Patel_Tailored_Resume.pdf");
+  const [processingStage, setProcessingStage] = useState("");
+  const [processingLogs, setProcessingLogs] = useState<string[]>([]);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Pre-fill from PWA Web Share Target (Android share sheet from LinkedIn/Naukri)
   useEffect(() => {
@@ -109,6 +112,28 @@ function ResumeTailorDashboard() {
 
     setIsLoading(true);
     setErrorMsg(null);
+    setElapsedSeconds(0);
+    setProcessingLogs([
+      jobUrl.trim() ? "Frontend: submitting job-post link to backend" : "Frontend: submitting job description to backend",
+      "Waiting for backend service",
+    ]);
+    setProcessingStage(jobUrl.trim() ? "Reading job post link" : "Validating job description");
+
+    const startedAt = Date.now();
+    const progressTimer = window.setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+      setElapsedSeconds(elapsed);
+      if (elapsed === 8) {
+        setProcessingStage("Tailoring resume with Gemini");
+        setProcessingLogs((logs) => [...logs, "Backend: Gemini structured tailoring started"]);
+      } else if (elapsed === 35) {
+        setProcessingStage("Rendering and verifying the 1-page PDF");
+        setProcessingLogs((logs) => [...logs, "Backend: rendering LaTeX and checking page count"]);
+      }
+    }, 1000);
+
+    const abortController = new AbortController();
+    const timeout = window.setTimeout(() => abortController.abort(), 65000);
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/tailor`, {
@@ -121,6 +146,7 @@ function ResumeTailorDashboard() {
           job_url: jobUrl.trim() || null,
           custom_instructions: customInstructions || null,
         }),
+        signal: abortController.signal,
       });
 
       if (!res.ok) {
@@ -130,6 +156,8 @@ function ResumeTailorDashboard() {
         );
       }
 
+      setProcessingStage("PDF completed; preparing preview");
+      setProcessingLogs((logs) => [...logs, "Backend: PDF compiled and page count verified"]);
       const data = await res.json();
       setPdfBase64(data.pdf_base64);
       setPageCount(data.page_count);
@@ -144,11 +172,15 @@ function ResumeTailorDashboard() {
       }
     } catch (err: any) {
       console.error("Tailor error:", err);
+      setProcessingLogs((logs) => [...logs, `Failed: ${err.name === "AbortError" ? "Request exceeded 65 seconds" : err.message}`]);
       setErrorMsg(
-        err.message ||
-          "Failed to connect to the backend tailoring service. Verify that the backend is running on port 8000."
+        err.name === "AbortError"
+          ? "The service did not finish within 65 seconds. The backend may be starting on Render; retry once it is awake."
+          : err.message || "Failed to connect to the backend tailoring service. Verify the Vercel API URL and Render backend."
       );
     } finally {
+      window.clearInterval(progressTimer);
+      window.clearTimeout(timeout);
       setIsLoading(false);
     }
   };
@@ -268,6 +300,8 @@ function ResumeTailorDashboard() {
                 setCustomInstructions={setCustomInstructions}
                 onTailor={handleTailor}
                 isLoading={isLoading}
+                processingStage={processingStage ? `${processingStage} · ${elapsedSeconds}s` : processingStage}
+                processingLogs={processingLogs}
               />
             </div>
 
@@ -328,6 +362,8 @@ function ResumeTailorDashboard() {
                 setCustomInstructions={setCustomInstructions}
                 onTailor={handleTailor}
                 isLoading={isLoading}
+                processingStage={processingStage ? `${processingStage} · ${elapsedSeconds}s` : processingStage}
+                processingLogs={processingLogs}
                 onSelectTab={setActiveTab}
               />
             </div>

@@ -87,7 +87,7 @@ def extract_job_post(job_url: str) -> tuple[str, Optional[str], Optional[str]]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Enter a valid public http(s) job-post URL.")
 
     try:
-        response = httpx.get(job_url.strip(), follow_redirects=True, timeout=15.0, headers={
+        response = httpx.get(job_url.strip(), follow_redirects=True, timeout=8.0, headers={
             "User-Agent": "Mozilla/5.0 (compatible; ResumeTailorBot/1.0)",
             "Accept": "text/html,application/xhtml+xml",
         })

@@ -152,7 +152,7 @@ def test_gemini_503_tries_lower_models_before_falling_back(monkeypatch, caplog):
             raise ServiceUnavailable("model overloaded")
 
     class FakeClient:
-        def __init__(self, api_key):
+        def __init__(self, api_key, http_options=None):
             self.models = FailingModels()
 
     monkeypatch.setenv("GEMINI_API_KEY", "test-key")
@@ -163,19 +163,16 @@ def test_gemini_503_tries_lower_models_before_falling_back(monkeypatch, caplog):
 
     result = tailor_resume_with_gemini(master, "Backend engineer")
 
-    assert len(attempts) == 9
+    assert len(attempts) == 6
     assert [attempt["model"] for attempt in attempts] == [
         "gemini-3.8-flash",
         "gemini-3.8-flash",
-        "gemini-3.8-flash",
         "gemini-3.5-flash-lite",
         "gemini-3.5-flash-lite",
-        "gemini-3.5-flash-lite",
-        "gemini-3.6-flash",
         "gemini-3.6-flash",
         "gemini-3.6-flash",
     ]
-    assert delays == [1, 2, 1, 2, 1, 2]
+    assert len(delays) == 3
     assert "trying next model gemini-3.5-flash-lite" in caplog.text
     assert result.tailored_resume.basics.name == master.basics.name
 
@@ -196,7 +193,7 @@ def test_gemini_uses_flash_lite_when_primary_hits_rate_limit(monkeypatch, caplog
             return type("Response", (), {"text": successful_json})()
 
     class FakeClient:
-        def __init__(self, api_key):
+        def __init__(self, api_key, http_options=None):
             self.models = FailingThenSuccessfulModels()
 
     monkeypatch.setenv("GEMINI_API_KEY", "test-key")
@@ -226,7 +223,7 @@ def test_gemini_overflow_retry_includes_trim_instruction(monkeypatch):
             return type("Response", (), {"text": successful_json})()
 
     class FakeClient:
-        def __init__(self, api_key):
+        def __init__(self, api_key, http_options=None):
             self.models = SuccessfulModels()
 
     monkeypatch.setenv("GEMINI_API_KEY", "test-key")

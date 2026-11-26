@@ -12,6 +12,8 @@ interface InputPanelProps {
   setCustomInstructions: (val: string) => void;
   onTailor: () => void;
   isLoading: boolean;
+  processingStage?: string;
+  processingLogs?: string[];
   onSelectTab?: (tab: "input" | "diff" | "pdf") => void;
 }
 
@@ -47,6 +49,8 @@ export default function InputPanel({
   setCustomInstructions,
   onTailor,
   isLoading,
+  processingStage,
+  processingLogs = [],
 }: InputPanelProps) {
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
 
@@ -81,7 +85,7 @@ Requirements:
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Nielsen (18 Mo) $\cdot$ 3 Key Projects $\cdot$ 5 Categorized Skill Stacks $\cdot$ Strict 1-Page LaTeX
+                Nielsen (18 Mo) · 3 Key Projects · 5 Categorized Skill Stacks · Strict 1-Page LaTeX
               </p>
             </div>
           </div>
@@ -117,7 +121,7 @@ Requirements:
         <div className="flex items-center justify-between">
           <label htmlFor="jd-input" className="text-sm font-medium text-slate-200 flex items-center gap-1.5">
             <span>Target Job Description (JD)</span>
-            <span className="text-rose-400">*</span>
+            <span className="text-xs text-slate-500">{jobUrl.trim() ? "(Link provided)" : "(Optional for link)"}</span>
           </label>
           <span className="text-xs text-slate-400">
             {jobDescription.length > 0 ? `${jobDescription.split(/\s+/).filter(Boolean).length} words` : "Paste raw text"}
@@ -181,6 +185,22 @@ Requirements:
           <span className="font-semibold text-slate-300">Truthful Production Framing:</span> Reframes production metrics and stack priorities around JD concepts without ever inventing fictional roles or companies. Strictly fit on Sunny&apos;s custom single-page LaTeX template.
         </div>
       </div>
+
+      {isLoading && (
+        <div className="rounded-lg border border-blue-500/20 bg-blue-950/20 p-3" aria-live="polite">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs font-semibold text-blue-300">{processingStage || "Starting..."}</span>
+            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
+          </div>
+          {processingLogs.length > 0 && (
+            <div className="mt-2 space-y-1 border-t border-blue-500/10 pt-2">
+              {processingLogs.slice(-4).map((log, index) => (
+                <p key={`${log}-${index}`} className="text-[11px] text-slate-400">{log}</p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tailor Action Button */}
       <button

@@ -262,7 +262,10 @@ def tailor_resume_with_gemini(
         from google import genai
         from google.genai import types
 
-        client = genai.Client(api_key=api_key)
+        client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(timeout=18000),
+        )
 
         rules = [
             "Bold preservation: preserve existing **markdown bold** emphasis and bold the same kinds of high-impact technologies and metrics in rewritten text.",
@@ -286,7 +289,7 @@ def tailor_resume_with_gemini(
         user_content = json.dumps(prompt_payload, indent=2)
 
         for model_index, model in enumerate(GEMINI_MODEL_CHAIN):
-            for attempt in range(3):
+            for attempt in range(2):
                 try:
                     response = client.models.generate_content(
                         model=model,
@@ -315,13 +318,12 @@ def tailor_resume_with_gemini(
                     return tailored_res
                 except Exception as e:
                     error_code = getattr(e, "code", None)
-                    if error_code == 503 and attempt < 2:
-                        delay = (2 ** attempt) + random.uniform(0, 0.25)
+                    if error_code == 503 and attempt < 1:
+                        delay = 0.75 + random.uniform(0, 0.25)
                         logger.warning(
-                            "Gemini model %s returned 503 UNAVAILABLE; retrying in %.2f seconds (%s/3).",
+                            "Gemini model %s returned 503 UNAVAILABLE; retrying in %.2f seconds (1/1).",
                             model,
                             delay,
-                            attempt + 2,
                         )
                         time.sleep(delay)
                         continue
