@@ -246,6 +246,7 @@ def tailor_resume_endpoint(request: TailorRequest):
 
     return TailorResponse(
         pdf_base64=pdf_b64,
+        extracted_job_description=job_description,
         download_filename=build_download_filename(job_title, organization_name),
         page_count=page_count,
         changes_summary=tailored_result.changes_summary,

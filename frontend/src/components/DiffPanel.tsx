@@ -155,7 +155,9 @@ export default function DiffPanel({ changesSummary, pageCount = 1 }: DiffPanelPr
             <div className="mt-3 flex items-start gap-2 rounded-lg bg-slate-950/50 p-2.5 text-xs text-slate-300">
               <Info className="h-3.5 w-3.5 text-blue-400 shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold text-blue-400">Alignment Rationale: </span>
+                <span className="font-semibold text-blue-400">
+                  {item.category.toLowerCase() === "projects" ? "Why This Project Was Selected: " : "Alignment Rationale: "}
+                </span>
                 {item.reason}
               </div>
             </div>

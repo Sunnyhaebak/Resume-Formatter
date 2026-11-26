@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import random
+import re
 import time
 from typing import Optional
 from dotenv import load_dotenv
@@ -35,9 +36,10 @@ CRITICAL RULES:
 1. ZERO FABRICATION:
    - You MUST NOT invent fictional companies, job titles, start/end dates, or fake degrees.
    - You may only use facts, experience, projects, and skills that exist in the Master Resume, with truthful reframing of architectural concepts.
-2. EXPERIENCE (NIELSEN) - STRICTLY 8 BULLET POINTS:
-   - The experience section for Nielsen MUST contain EXACTLY 8 bullet points.
-   - Jumble and prioritize the most relevant bullet points to the target JD at the very top of the 8 bullets.
+2. EXPERIENCE (NIELSEN) - 3 TO 5 JD-MATCHED BULLETS:
+   - Nielsen MUST contain 3 to 5 bullet points. Prefer 5 only when every bullet is concise and directly relevant.
+   - Select and reorder bullets from the Master Resume to match the target JD; remove weaker or less relevant points instead of inventing facts.
+   - Rewrite each retained bullet truthfully around the JD's required technologies, impact metrics, and responsibilities.
    - Enhance and reframe the phrasing with high-impact keywords (e.g., high-traffic production scale, 99.95% uptime, API throughput, Redis caching, distributed microservices) to deeply impress HR and hiring managers.
 3. PROJECTS - STRICTLY 3 PROJECTS IN EXACT ORDER:
    - Project 1 (Top / Position 1): Generate ONE highly relevant project tailored according to the target company's core requirement or company clone (e.g., high-concurrency dispatch, fintech payment, on-demand logistics, or microservices).
@@ -48,7 +50,7 @@ CRITICAL RULES:
 5. STRICT 1-PAGE SPACE BUDGET:
    - Each bullet must be concise, dense, and impactful so the entire resume strictly fits on a single page.
 6. EXPLANATION OF CHANGES:
-   - In `changes_summary`, explain which Nielsen bullets were prioritized to the top, describe the generated Project 1 tailored to the company, and document the skill reordering rationale.
+   - In `changes_summary`, explain which Nielsen bullets were selected and why, describe exactly why Project 1 matches the target role, and document the skill reordering rationale.
 """
 
 
@@ -61,7 +63,7 @@ def get_mock_tailored_response(
     Deterministic tailoring engine tailored for Sunny Patel:
     1. Generates Project 1 matching the company requirements (e.g. high-traffic platform).
     2. Places Telemedicine second, and Field-Service third.
-    3. Reorders and reframes Nielsen's 8 bullets with high-traffic production points at the top.
+    3. Selects and reframes up to five Nielsen bullets with the strongest JD alignment.
     """
     jd_lower = job_description.lower()
     diffs: list[DiffItem] = []
@@ -106,24 +108,21 @@ def get_mock_tailored_response(
         )
     )
 
-    # 3. Experience (Nielsen) - EXACTLY 8 BULLET POINTS, prioritized to the top
+    # 3. Experience (Nielsen) - up to five bullets prioritized by JD relevance
     tailored_experiences: list[ExperienceItem] = []
     for exp in master_resume.experience:
         raw_bullets = list(exp.bullets)
 
-        # Prioritize high-traffic, production, and REST API bullets to the top if JD asks for it
-        if "high-traffic" in jd_lower or "production" in jd_lower or "traffic" in jd_lower:
-            # Move uptime, Redis caching, 12+ REST APIs, and FastAPI async workers to the top
-            priority_keywords = ["99.95% production uptime", "Redis caching", "12+ REST APIs", "FastAPI"]
-            sorted_bullets = sorted(
-                raw_bullets,
-                key=lambda b: min([i for i, kw in enumerate(priority_keywords) if kw.lower() in b.lower()] + [99])
-            )
-        else:
-            sorted_bullets = raw_bullets
+        # Rank bullets by direct overlap with the target JD while preserving source wording.
+        jd_terms = {term for term in re.findall(r"[a-zA-Z][a-zA-Z0-9+.-]{2,}", jd_lower)}
+        sorted_bullets = sorted(
+            raw_bullets,
+            key=lambda bullet: sum(term in bullet.lower() for term in jd_terms),
+            reverse=True,
+        )
 
-        # Ensure exactly 8 bullets
-        final_8_bullets = sorted_bullets[:8]
+        # Keep only the strongest 3-5 JD-relevant bullets.
+        final_8_bullets = sorted_bullets[:5]
 
         tailored_experiences.append(
             ExperienceItem(
@@ -142,7 +141,7 @@ def get_mock_tailored_response(
                 item_name=f"{exp.role} @ {exp.company}",
                 original=exp.bullets,
                 tailored=final_8_bullets,
-                reason="Jumbled and prioritized high-traffic production resilience, Redis caching (60% to 22%), and 12+ REST APIs to the top of the 8 bullet points."
+                reason="Selected up to five high-impact Nielsen bullets directly relevant to the target JD, prioritizing production resilience, Redis performance, APIs, and the strongest JD-matched technologies."
             )
         )
 
@@ -206,7 +205,7 @@ def get_mock_tailored_response(
             item_name="Project 1 (Target Company Requirement Clone)",
             original="Generic Portfolio Projects",
             tailored=f"{proj_1.name} ({proj_1.tech_stack})",
-            reason="Generated high-concurrency production project specifically cloned to mirror the target company's business domain and high-traffic regional scale."
+            reason=f"Project 1 was selected or generated because it mirrors the JD's strongest domain and technology signals: {proj_1.tech_stack}. It provides a truthful transferable demonstration of the target role's systems and delivery requirements."
         )
     )
     diffs.append(
@@ -227,9 +226,17 @@ def get_mock_tailored_response(
         practices=master_resume.skills.practices,
     )
 
+    tailored_summary = master_resume.summary
+    if "rag" in jd_lower or "semantic" in jd_lower or "open search" in jd_lower:
+        tailored_summary = "Backend and Full-Stack Software Engineer with **18 months of production experience at Nielsen**, specializing in distributed microservices, REST APIs, event-driven pipelines, and production RAG integrations. Experienced in semantic/vector search, Amazon OpenSearch, Redis performance optimization, and cloud-backed scalable systems."
+    elif "frontend" in jd_lower or "react" in jd_lower:
+        tailored_summary = "Backend and Full-Stack Software Engineer with **18 months of production experience at Nielsen**, building React applications, REST APIs, enterprise microservices, Redis integrations, and distributed cloud services. Experienced in self-service dashboards, real-time communication, RBAC, and production full-stack delivery."
+    elif "java" in jd_lower or "spring" in jd_lower:
+        tailored_summary = "Backend and Full-Stack Software Engineer with **18 months of production experience at Nielsen**, building enterprise microservices, REST APIs, event-driven systems, Redis caching, and cloud integrations. Experienced in distributed Java-adjacent systems, Spring-ready API design, production resilience, and scalable backend architecture."
+
     tailored_resume = TailoredResume(
         basics=master_resume.basics,
-        summary=master_resume.summary,
+        summary=tailored_summary,
         skills=tailored_skills,
         experience=tailored_experiences,
         projects=final_projects,
@@ -269,8 +276,9 @@ def tailor_resume_with_gemini(
 
         rules = [
             "Bold preservation: preserve existing **markdown bold** emphasis and bold the same kinds of high-impact technologies and metrics in rewritten text.",
-            "Experience: Nielsen MUST have EXACTLY 8 bullet points. Jumble and prioritize high-traffic, relevant points to the top.",
-            "Projects: Project 1 MUST be a newly generated relevant project matching the company's requirement/clone. Project 2 MUST be Telemedicine. Project 3 MUST be Field-Service Management.",
+            "Experience: Nielsen MUST have 3 to 5 bullets, preferably 5, selected and rewritten to match the JD; do not retain weaker irrelevant bullets.",
+            "Projects: Project 1 MUST be a newly generated relevant project matching the company's requirement/clone and explain its JD alignment in changes_summary. Project 2 MUST be Telemedicine. Project 3 MUST be Field-Service Management.",
+            "Summary: rewrite the professional summary for this specific JD, preserving every verified metric and fact, and prioritize only JD-matched capabilities.",
             "Skills: Reorder skills so matching tech is at the top of each category.",
             "Single page: All bullets must be tight and concise."
         ]

@@ -187,7 +187,7 @@ def generate_reportlab_pdf(tailored_resume: TailoredResume) -> bytes:
     story.append(st)
     story.append(Spacer(1, 2))
 
-    # 4. Experience (Nielsen - Exactly 8 Bullets)
+    # 4. Experience (Nielsen - up to five JD-matched bullets)
     add_section("EXPERIENCE")
     for exp in tailored_resume.experience:
         exp_table = [
@@ -207,8 +207,8 @@ def generate_reportlab_pdf(tailored_resume: TailoredResume) -> bytes:
         story.append(et)
         story.append(Spacer(1, 1))
 
-        # Enforce up to 8 bullets
-        for bullet in exp.bullets[:8]:
+        # Enforce a concise five-bullet maximum
+        for bullet in exp.bullets[:5]:
             clean_b = clean_latex_markup_for_reportlab(bullet)
             story.append(Paragraph(f'<font color="#1D4E89">&bull;</font> {clean_b}', experience_bullet_style))
             story.append(Spacer(1, 0.4))

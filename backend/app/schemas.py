@@ -130,6 +130,7 @@ class TailorRequest(BaseModel):
 
 class TailorResponse(BaseModel):
     pdf_base64: str = Field(description="Base64-encoded PDF compiled from LaTeX")
+    extracted_job_description: str = Field(default="", description="Readable job description extracted from the provided post link")
     download_filename: str = Field(default="Sunny_Patel_Tailored_Resume.pdf", description="Suggested download filename")
     page_count: int = Field(description="Strict page count of compiled PDF (must be 1)")
     changes_summary: List[DiffItem] = Field(description="List of what was changed and why")

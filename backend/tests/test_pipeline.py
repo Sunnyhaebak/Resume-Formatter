@@ -242,6 +242,18 @@ def test_download_filename_uses_post_and_organization():
     assert filename == "Sunny_Patel_Acme_Cloud_Backend_Engineer_Resume.pdf"
 
 
+def test_mock_tailoring_limits_nielsen_to_five_jd_matched_bullets():
+    master = load_default_master_resume()
+
+    result = get_mock_tailored_response(
+        master,
+        "Backend engineer role requiring Redis caching, REST APIs, FastAPI, and distributed microservices.",
+    )
+
+    assert len(result.tailored_resume.experience[0].bullets) <= 5
+    assert result.tailored_resume.summary
+
+
 def test_template_preserves_markdown_bold_for_experience_metrics():
     master = load_default_master_resume()
 

@@ -165,6 +165,9 @@ function ResumeTailorDashboard() {
       setLatexSource(data.latex_source || null);
       setTailoredData(data.tailored_data || null);
       setDownloadFilename(data.download_filename || "Sunny_Patel_Tailored_Resume.pdf");
+      if (jobUrl.trim() && data.extracted_job_description) {
+        setJobDescription(data.extracted_job_description);
+      }
 
       // On mobile, auto-switch to preview
       if (typeof window !== "undefined" && window.innerWidth < 768) {
