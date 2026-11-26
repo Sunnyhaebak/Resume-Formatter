@@ -221,6 +221,8 @@ def test_gemini_overflow_retry_includes_trim_instruction(monkeypatch):
     class SuccessfulModels:
         def generate_content(self, **kwargs):
             captured_payload.update(json.loads(kwargs["contents"][1].text))
+            captured_payload["thinking_budget"] = kwargs["config"].thinking_config.thinking_budget
+            captured_payload["include_thoughts"] = kwargs["config"].thinking_config.include_thoughts
             return type("Response", (), {"text": successful_json})()
 
     class FakeClient:
@@ -233,3 +235,14 @@ def test_gemini_overflow_retry_includes_trim_instruction(monkeypatch):
     tailor_resume_with_gemini(master, "Backend engineer", trim_percentage=15)
 
     assert any("approximately 15%" in rule for rule in captured_payload["rules"])
+    assert captured_payload["thinking_budget"] == 0
+    assert captured_payload["include_thoughts"] is False
+
+
+def test_template_preserves_markdown_bold_for_experience_metrics():
+    master = load_default_master_resume()
+
+    rendered_tex = render_latex(master)
+
+    assert r"\textbf{Redis caching}" in rendered_tex
+    assert r"\textbf{60\% to 22\%}" in rendered_tex

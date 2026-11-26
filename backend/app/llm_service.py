@@ -28,6 +28,10 @@ SYSTEM_PROMPT = """You are an elite, truthful Executive Technical Resume Tailori
 Your goal is to tailor the candidate's verified Master Resume JSON to maximally align with the target Job Description (JD) and any Custom Instructions provided.
 
 CRITICAL RULES:
+0. BOLD PRESERVATION:
+   - Preserve every existing `**bold**` emphasis exactly from the Master Resume.
+   - Keep key achievements and metrics bold, especially Redis, 60% to 22%, 12+ REST APIs, 15 global markets, 226.4 million, 99.95% uptime, MCP server, FastAPI, and 33%.
+   - Use Markdown `**text**` around important keywords and metrics in summaries, skills, experience bullets, project bullets, and achievements. Do not bold entire sentences or ordinary words.
 1. ZERO FABRICATION:
    - You MUST NOT invent fictional companies, job titles, start/end dates, or fake degrees.
    - You may only use facts, experience, projects, and skills that exist in the Master Resume, with truthful reframing of architectural concepts.
@@ -261,6 +265,7 @@ def tailor_resume_with_gemini(
         client = genai.Client(api_key=api_key)
 
         rules = [
+            "Bold preservation: preserve existing **markdown bold** emphasis and bold the same kinds of high-impact technologies and metrics in rewritten text.",
             "Experience: Nielsen MUST have EXACTLY 8 bullet points. Jumble and prioritize high-traffic, relevant points to the top.",
             "Projects: Project 1 MUST be a newly generated relevant project matching the company's requirement/clone. Project 2 MUST be Telemedicine. Project 3 MUST be Field-Service Management.",
             "Skills: Reorder skills so matching tech is at the top of each category.",
@@ -295,6 +300,11 @@ def tailor_resume_with_gemini(
                             system_instruction=SYSTEM_PROMPT,
                             response_mime_type="application/json",
                             response_schema=TailoredResumeResponse,
+                            temperature=0.2,
+                            thinking_config=types.ThinkingConfig(
+                                thinking_budget=0,
+                                include_thoughts=False,
+                            ),
                         ),
                     )
                     if not response.text:
