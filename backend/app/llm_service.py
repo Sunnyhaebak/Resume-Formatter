@@ -36,8 +36,7 @@ CRITICAL RULES:
 1. ZERO FABRICATION:
    - You MUST NOT invent fictional companies, job titles, start/end dates, or fake degrees.
    - You may only use facts, experience, projects, and skills that exist in the Master Resume, with truthful reframing of architectural concepts.
-    - Project 1 is the sole exception: it is a clearly labeled proposed concept, not candidate work history, and must not claim completion or fabricated outcomes.
-2. EXPERIENCE (NIELSEN) - 5 TO 8 JD-MATCHED BULLETS:
+    - Project 1 is the sole exception
     - Nielsen MUST contain at least 5 bullet points and at most the number supplied by the Master Resume (currently 8).
     - Prefer 5. Use additional source-supported bullets up to 8 when the JD makes them relevant and the page still fits.
    - Select and reorder bullets from the Master Resume to match the target JD; remove weaker or less relevant points instead of inventing facts.
@@ -157,7 +156,7 @@ def get_mock_tailored_response(
     diffs.append(
         DiffItem(
             category="Projects",
-            item_name="Project 1 (AI-Generated Proposed Concept)",
+            item_name="Project 1 (AI-Generated)",
             original="No proposed concept",
             tailored=f"{project_1.name} ({project_1.tech_stack})",
             reason=f"Generated as a clearly labeled proposed concept to align with the JD's requirements. Its technology stack is limited to verified skills: {project_1.tech_stack}. It is not represented as completed work."
@@ -261,7 +260,7 @@ def _make_proposed_project(master_resume: MasterResume, job_description: str) ->
 
     return ProjectItem(
         id="proj-jd-concept",
-        name=f"{domain} (Proposed Concept)",
+        name=f"{domain}",
         tech_stack=tech_stack,
         link="",
         bullets=[
@@ -338,7 +337,7 @@ def _enforce_response_contract(
         else:
             proposed_project.id = "proj-jd-concept"
             if "proposed concept" not in proposed_project.name.lower():
-                proposed_project.name = f"{proposed_project.name} (Proposed Concept)"
+                proposed_project.name = f"{proposed_project.name}"
             proposed_project.link = ""
     else:
         proposed_project = fallback_concept
@@ -356,7 +355,7 @@ def _enforce_response_contract(
     response.changes_summary.extend([
         DiffItem(
             category="Projects",
-            item_name="Project 1 (AI-Generated Proposed Concept)",
+            item_name="Project 1 (AI-Generated)",
             original="No proposed concept",
             tailored=f"{proposed_project.name} ({proposed_project.tech_stack})",
             reason="Generated to demonstrate a solution concept aligned to this JD. It is explicitly marked as proposed, uses verified technologies, and is not represented as completed work.",
