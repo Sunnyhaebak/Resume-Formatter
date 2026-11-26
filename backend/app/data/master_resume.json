@@ -82,43 +82,113 @@
   ],
   "projects": [
     {
-      "id": "proj-company-clone",
-      "name": "Hyper-Local On-Demand Logistics & Delivery Dispatch Platform",
-      "tech_stack": "Go, NestJS, PostgreSQL, Redis Cluster, RabbitMQ, WebSockets, Docker",
-      "link": "github.com/sunnyhaebak",
+      "id": "proj-pulsepass",
+      "name": "PulsePass Telemedicine & Outpatient Consultation Platform",
+      "tech_stack": "Next.js, NestJS, PostgreSQL, Redis, Socket.IO, AWS S3, Razorpay, Docker",
+      "link": "https://github.com/Sunnyhaebak/PulsePass-Telemedicine",
       "bullets": [
-        "Engineered high-concurrency order dispatching and geospatial driver routing engine handling **15,000+ peak orders/hour** with sub-50ms dispatch latency.",
-        "Designed idempotent order state machine with **Redis distributed locks** and **RabbitMQ event streaming**, preventing duplicate transactions across erratic mobile networks."
+        "Built a production-grade telemedicine platform for appointments, outpatient consultations, real-time communication, and patient workflows.",
+        "Integrated **Redis**, **Socket.IO**, AWS S3, Razorpay payments, and Docker-based full-stack services."
       ]
     },
     {
-      "id": "proj-telemed",
-      "name": "Telemedicine & Patient Consultation Platform",
-      "tech_stack": "NestJS, Next.js, PostgreSQL, Redis, Socket.IO, AWS S3",
-      "link": "github.com/sunnyhaebak",
+      "id": "proj-fleet",
+      "name": "Peppermint Robotics Fleet Command Dashboard",
+      "tech_stack": "JavaScript, Python, HTML, Docker",
+      "link": "https://github.com/Sunnyhaebak/peppermint-fleet-dashboard",
       "bullets": [
-        "Built a healthcare platform for consultation passes, doctor appointments, and outpatient queue management.",
-        "Engineered concurrency-safe booking using database transactions and caching; implemented real-time **Socket.IO** chat, session guards, and secure report sharing via time-limited **S3 pre-signed URLs**."
+        "Built a fleet command dashboard for robot status, events, and operational monitoring.",
+        "Implemented data-driven UI views using JSON/JSONL operational data and Docker-based setup."
       ]
     },
     {
-      "id": "proj-field-service",
-      "name": "Field-Service Management Platform (ATI Motors Contract)",
-      "tech_stack": "React, Node.js, PostgreSQL, JWT, AWS EC2",
-      "link": "github.com/sunnyhaebak",
+      "id": "proj-cardwise",
+      "name": "CardWise Credit Card Rewards Dashboard",
+      "tech_stack": "TypeScript, Python, React, CSS, HTML",
+      "link": "https://github.com/Sunnyhaebak/cardwise",
       "bullets": [
-        "Delivered a B2B field-service platform for **50 technicians**, featuring role-based dashboards, JWT authentication, GPS-geofenced attendance, and state-machine ticket workflows.",
-        "Achieved **95% on-time ticket resolution** through idempotent ERP sync and exponential-backoff retries; deployed on AWS EC2 with Nginx and zero-downtime releases."
+        "Built a full-stack credit-card bill payment and rewards dashboard with spending analytics.",
+        "Implemented payment flows, reward coins, and user-facing financial insights."
+      ]
+    },
+    {
+      "id": "proj-multitenant-crm",
+      "name": "Multi-Tenant SaaS CRM",
+      "tech_stack": "Java 21, Spring Boot 3.2, TypeScript, JWT, RBAC, Docker",
+      "link": "https://github.com/Sunnyhaebak/multi-tenant-cmr",
+      "bullets": [
+        "Built a multi-tenant CRM with schema-per-tenant data isolation and JWT authentication.",
+        "Implemented **RBAC**, sales workflows, and tenant-aware backend architecture."
+      ]
+    },
+    {
+      "id": "proj-cognodb",
+      "name": "DevNet Developer Skills Network",
+      "tech_stack": "CognoDB, Node.js, Express, TypeScript",
+      "link": "https://github.com/Sunnyhaebak/cognodb-devnet",
+      "bullets": [
+        "Built a graph database application mapping developers, skills, projects, and companies.",
+        "Connected graph relationships through a Node.js/Express and TypeScript backend."
+      ]
+    },
+    {
+      "id": "proj-payout",
+      "name": "User Payout Management System",
+      "tech_stack": "Node.js, Express, JavaScript",
+      "link": "https://github.com/Sunnyhaebak/user-payout-system",
+      "bullets": [
+        "Built payout reconciliation and approval workflows for affiliate sales and withdrawals.",
+        "Implemented withdrawal cooldowns and failed-payout recovery handling."
       ]
     },
     {
       "id": "proj-ai-agent",
       "name": "AI Agent Platform",
-      "tech_stack": "FastAPI, PostgreSQL, Redis, GPT-4, Docker",
-      "link": "github.com/sunnyhaebak",
+      "tech_stack": "FastAPI, PostgreSQL, Redis, ReAct, Docker",
+      "link": "https://github.com/Sunnyhaebak/AI-agent-platform",
       "bullets": [
-        "Built a ReAct-based agent backend with a tool registry, JSON-schema validation, **3-tier RBAC**, Redis conversation memory, and PostgreSQL audit trails.",
-        "Implemented SQL-injection/shell-command guardrails and PII output redaction for secure AI interactions."
+        "Built a ReAct-based agent backend with tool execution, **RBAC**, Redis conversation memory, and audit logging.",
+        "Implemented sliding-window rate limiting, input/output guardrails, and PII-safe response controls."
+      ]
+    },
+    {
+      "id": "proj-amr",
+      "name": "AMR Service",
+      "tech_stack": "TypeScript, JavaScript, Shell, HTML, CSS",
+      "link": "https://github.com/Sunnyhaebak/AMR-SERVICE",
+      "bullets": [
+        "Built an application for autonomous mobile robot service workflows.",
+        "Implemented web-facing service components and automation-oriented tooling."
+      ]
+    },
+    {
+      "id": "proj-video-socket",
+      "name": "Video Communication WebSocket Platform",
+      "tech_stack": "JavaScript, WebSockets, HTML, CSS",
+      "link": "https://github.com/Sunnyhaebak/video-project-websocket",
+      "bullets": [
+        "Built real-time video communication interfaces using WebSocket-based signaling.",
+        "Implemented browser-side HTML/CSS/JavaScript communication workflows."
+      ]
+    },
+    {
+      "id": "proj-restaurant",
+      "name": "Restaurant Website",
+      "tech_stack": "HTML, CSS",
+      "link": "https://github.com/Sunnyhaebak/restaurant",
+      "bullets": [
+        "Built a responsive restaurant website with structured menus and presentation sections.",
+        "Implemented accessible HTML and custom CSS layouts."
+      ]
+    },
+    {
+      "id": "proj-resume-formatter",
+      "name": "AI-Powered Resume Tailoring Engine",
+      "tech_stack": "Python, FastAPI, Next.js, TypeScript, Gemini, LaTeX, Docker",
+      "link": "https://github.com/Sunnyhaebak/Resume-Formatter",
+      "bullets": [
+        "Built a full-stack resume tailoring and PDF rendering platform using FastAPI and Next.js.",
+        "Integrated structured Gemini outputs, LaTeX compilation, ReportLab fallback, and deployment workflows."
       ]
     }
   ],

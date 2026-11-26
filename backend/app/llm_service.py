@@ -36,15 +36,16 @@ CRITICAL RULES:
 1. ZERO FABRICATION:
    - You MUST NOT invent fictional companies, job titles, start/end dates, or fake degrees.
    - You may only use facts, experience, projects, and skills that exist in the Master Resume, with truthful reframing of architectural concepts.
-2. EXPERIENCE (NIELSEN) - 3 TO 5 JD-MATCHED BULLETS:
-   - Nielsen MUST contain 3 to 5 bullet points. Prefer 5 only when every bullet is concise and directly relevant.
+2. EXPERIENCE (NIELSEN) - 5 TO 8 JD-MATCHED BULLETS:
+   - Nielsen MUST contain at least 5 bullet points and at most 8, matching the Master Resume bullet supply.
+   - Start with 5 of the strongest bullets. Use 6 to 8 only when each extra point is explicitly relevant to the JD and still fits one page.
    - Select and reorder bullets from the Master Resume to match the target JD; remove weaker or less relevant points instead of inventing facts.
    - Rewrite each retained bullet truthfully around the JD's required technologies, impact metrics, and responsibilities.
    - Enhance and reframe the phrasing with high-impact keywords (e.g., high-traffic production scale, 99.95% uptime, API throughput, Redis caching, distributed microservices) to deeply impress HR and hiring managers.
-3. PROJECTS - STRICTLY 3 PROJECTS IN EXACT ORDER:
-   - Project 1 (Top / Position 1): Generate ONE highly relevant project tailored according to the target company's core requirement or company clone (e.g., high-concurrency dispatch, fintech payment, on-demand logistics, or microservices).
-   - Project 2 (Position 2): MUST BE 'Telemedicine & Patient Consultation Platform' (using NestJS, Next.js, PostgreSQL, Redis, Socket.IO, S3).
-   - Project 3 (Position 3): MUST BE 'Field-Service Management Platform (ATI Motors Contract)' (using React, Node.js, PostgreSQL, JWT, EC2).
+3. PROJECTS - STRICTLY 3 VERIFIED GITHUB PROJECTS IN JD-RANKED ORDER:
+   - Select Project 1 as the strongest repository match to the target company's core requirement; do not invent repositories or metrics.
+   - Select Project 2 and Project 3 from the remaining verified GitHub project catalog, ranked by technology and domain overlap with the JD.
+   - Preserve the repository names, technology stacks, and truthful repository links from the Master Resume.
 4. TECHNICAL SKILLS:
    - Reorder the technologies in Backend & AI, Languages, and Cloud & Data so that the skills matching the target JD appear first in each category.
 5. STRICT 1-PAGE SPACE BUDGET:
@@ -62,7 +63,7 @@ def get_mock_tailored_response(
     """
     Deterministic tailoring engine tailored for Sunny Patel:
     1. Generates Project 1 matching the company requirements (e.g. high-traffic platform).
-    2. Places Telemedicine second, and Field-Service third.
+    2. Ranks verified GitHub projects 2 and 3 by the target JD.
     3. Selects and reframes up to five Nielsen bullets with the strongest JD alignment.
     """
     jd_lower = job_description.lower()
@@ -121,8 +122,11 @@ def get_mock_tailored_response(
             reverse=True,
         )
 
-        # Keep only the strongest 3-5 JD-relevant bullets.
-        final_8_bullets = sorted_bullets[:5]
+        # Keep at least five points; use up to eight only when the extra bullets match the JD.
+        relevant_bullets = [bullet for bullet in sorted_bullets if sum(term in bullet.lower() for term in jd_terms) > 0]
+        final_count = min(len(exp.bullets), max(5, min(8, len(relevant_bullets))))
+        final_count = max(5, final_count)
+        final_8_bullets = sorted_bullets[:final_count]
 
         tailored_experiences.append(
             ExperienceItem(
@@ -141,80 +145,36 @@ def get_mock_tailored_response(
                 item_name=f"{exp.role} @ {exp.company}",
                 original=exp.bullets,
                 tailored=final_8_bullets,
-                reason="Selected up to five high-impact Nielsen bullets directly relevant to the target JD, prioritizing production resilience, Redis performance, APIs, and the strongest JD-matched technologies."
+                reason="Selected five to eight high-impact Nielsen bullets directly relevant to the target JD, prioritizing production resilience, Redis performance, APIs, and the strongest JD-matched technologies without exceeding one page."
             )
         )
 
-    # 4. Projects: Project 1 (Company clone/requirement), Project 2 (Telemedicine), Project 3 (Field-Service)
-    if "iraq" in jd_lower or "delivery" in jd_lower or "traffic" in jd_lower:
-        proj_1 = ProjectItem(
-            id="proj-company-clone",
-            name="Hyper-Local On-Demand Logistics & Delivery Dispatch Platform",
-            tech_stack="Go, NestJS, PostgreSQL, Redis Cluster, RabbitMQ, WebSockets, Docker",
-            link="github.com/sunnyhaebak",
-            bullets=[
-                "Engineered high-concurrency order dispatching and geospatial driver routing engine handling **15,000+ peak orders/hour** with sub-50ms dispatch latency.",
-                "Designed idempotent order state machine with **Redis distributed locks** and **RabbitMQ event streaming**, preventing duplicate transactions across erratic mobile networks."
-            ]
-        )
-    else:
-        proj_1 = ProjectItem(
-            id="proj-company-clone",
-            name="High-Throughput Enterprise Microservices & Event Stream Engine",
-            tech_stack="NestJS, FastAPI, PostgreSQL, Redis, RabbitMQ, Docker",
-            link="github.com/sunnyhaebak",
-            bullets=[
-                "Architected distributed event-driven microservices processing **20M+ daily events** with sub-40ms p99 latency across distributed clusters.",
-                "Implemented resilient asynchronous messaging with dead-letter queues and Redis cache invalidation, ensuring **99.99% data consistency**."
-            ]
-        )
+    # 4. Projects: rank all verified GitHub repositories deterministically against the JD.
+    verified_projects = list(master_resume.projects)
 
-    # Project 2: Telemedicine (strictly 2nd)
-    proj_2 = next((p for p in master_resume.projects if p.id == "proj-telemed"), None)
-    if not proj_2:
-        proj_2 = ProjectItem(
-            id="proj-telemed",
-            name="Telemedicine & Patient Consultation Platform",
-            tech_stack="NestJS, Next.js, PostgreSQL, Redis, Socket.IO, AWS S3",
-            link="github.com/sunnyhaebak",
-            bullets=[
-                "Built a healthcare platform for consultation passes, doctor appointments, and outpatient queue management.",
-                "Engineered concurrency-safe booking using database transactions and caching; implemented real-time **Socket.IO** chat, session guards, and secure report sharing via time-limited **S3 pre-signed URLs**."
-            ]
-        )
+    def project_score(project: ProjectItem) -> int:
+        searchable = f"{project.name} {project.tech_stack} {' '.join(project.bullets)}".lower()
+        return sum(1 for term in jd_terms if term in searchable)
 
-    # Project 3: Field-Service (strictly 3rd)
-    proj_3 = next((p for p in master_resume.projects if p.id == "proj-field-service"), None)
-    if not proj_3:
-        proj_3 = ProjectItem(
-            id="proj-field-service",
-            name="Field-Service Management Platform (ATI Motors Contract)",
-            tech_stack="React, Node.js, PostgreSQL, JWT, AWS EC2",
-            link="github.com/sunnyhaebak",
-            bullets=[
-                "Delivered a B2B field-service platform for **50 technicians**, featuring role-based dashboards, JWT authentication, GPS-geofenced attendance, and state-machine ticket workflows.",
-                "Achieved **95% on-time ticket resolution** through idempotent ERP sync and exponential-backoff retries; deployed on AWS EC2 with Nginx and zero-downtime releases."
-            ]
-        )
-
-    final_projects = [proj_1, proj_2, proj_3]
+    ranked_projects = sorted(verified_projects, key=project_score, reverse=True)
+    final_projects = ranked_projects[:3]
 
     diffs.append(
         DiffItem(
             category="Projects",
-            item_name="Project 1 (Target Company Requirement Clone)",
-            original="Generic Portfolio Projects",
-            tailored=f"{proj_1.name} ({proj_1.tech_stack})",
-            reason=f"Project 1 was selected or generated because it mirrors the JD's strongest domain and technology signals: {proj_1.tech_stack}. It provides a truthful transferable demonstration of the target role's systems and delivery requirements."
+            item_name="Project 1 (Highest JD-Relevance Repository)",
+            original="Unranked GitHub project catalog",
+            tailored=f"{final_projects[0].name} ({final_projects[0].tech_stack})",
+            reason=f"Project 1 was selected because it has the strongest verified GitHub technology and domain overlap with the JD: {final_projects[0].tech_stack}."
         )
     )
     diffs.append(
         DiffItem(
             category="Projects",
-            item_name="Project 2 & 3 Portfolio Sequencing",
-            original="Random project ordering",
-            tailored="Position 2: Telemedicine Platform | Position 3: Field-Service Platform",
-            reason="Preserved Telemedicine as project 2 and Field-Service as project 3 to establish proven production full-stack depth."
+            item_name="Project 2 & 3 JD-Ranked Portfolio Selection",
+            original="Unranked GitHub project catalog",
+            tailored=" | ".join(project.name for project in final_projects[1:3]),
+            reason="Ranked the remaining owned GitHub repositories by technology and domain overlap with the target JD."
         )
     )
 
@@ -276,8 +236,8 @@ def tailor_resume_with_gemini(
 
         rules = [
             "Bold preservation: preserve existing **markdown bold** emphasis and bold the same kinds of high-impact technologies and metrics in rewritten text.",
-            "Experience: Nielsen MUST have 3 to 5 bullets, preferably 5, selected and rewritten to match the JD; do not retain weaker irrelevant bullets.",
-            "Projects: Project 1 MUST be a newly generated relevant project matching the company's requirement/clone and explain its JD alignment in changes_summary. Project 2 MUST be Telemedicine. Project 3 MUST be Field-Service Management.",
+            "Experience: Nielsen MUST have at least 5 bullets and no more than 8. Prefer 5; use more only when the JD clearly supports every extra bullet and the page remains one page.",
+            "Projects: select exactly three verified GitHub projects from the Master Resume. Rank positions 1-3 by JD domain and technology match, explain Project 1 selection in changes_summary, and do not invent a repository or metric.",
             "Summary: rewrite the professional summary for this specific JD, preserving every verified metric and fact, and prioritize only JD-matched capabilities.",
             "Skills: Reorder skills so matching tech is at the top of each category.",
             "Single page: All bullets must be tight and concise."

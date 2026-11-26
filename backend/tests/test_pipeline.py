@@ -242,6 +242,24 @@ def test_download_filename_uses_post_and_organization():
     assert filename == "Sunny_Patel_Acme_Cloud_Backend_Engineer_Resume.pdf"
 
 
+def test_master_resume_contains_verified_github_project_catalog():
+    master = load_default_master_resume()
+
+    assert len(master.projects) >= 10
+    assert all(project.link.startswith("https://github.com/Sunnyhaebak/") for project in master.projects)
+
+
+def test_mock_tailoring_ranks_spring_project_from_verified_catalog():
+    master = load_default_master_resume()
+
+    result = get_mock_tailored_response(
+        master,
+        "Java 21 Spring Boot backend engineer requiring CRM, JWT, RBAC, and microservices.",
+    )
+
+    assert result.tailored_resume.projects[0].name == "Multi-Tenant SaaS CRM"
+
+
 def test_mock_tailoring_limits_nielsen_to_five_jd_matched_bullets():
     master = load_default_master_resume()
 
@@ -250,7 +268,7 @@ def test_mock_tailoring_limits_nielsen_to_five_jd_matched_bullets():
         "Backend engineer role requiring Redis caching, REST APIs, FastAPI, and distributed microservices.",
     )
 
-    assert len(result.tailored_resume.experience[0].bullets) <= 5
+    assert 5 <= len(result.tailored_resume.experience[0].bullets) <= 8
     assert result.tailored_resume.summary
 
 

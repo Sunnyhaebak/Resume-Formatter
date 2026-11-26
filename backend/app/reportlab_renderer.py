@@ -214,7 +214,7 @@ def generate_reportlab_pdf(tailored_resume: TailoredResume) -> bytes:
             story.append(Spacer(1, 0.4))
     story.append(Spacer(1, 1.5))
 
-    # 5. Projects (Top 3: Company Requirement top, Telemedicine 2nd, Field-Service 3rd)
+    # 5. Projects (Top 3 verified GitHub repositories ranked by JD relevance)
     add_section("PROJECTS")
     for proj in tailored_resume.projects[:3]:
         p_name = clean_latex_markup_for_reportlab(proj.name)
