@@ -45,8 +45,7 @@ CRITICAL RULES:
    - Enhance and reframe the phrasing with high-impact keywords (e.g., high-traffic production scale, 99.95% uptime, API throughput, Redis caching, distributed microservices) to deeply impress HR and hiring managers.
 3. PROJECTS - STRICTLY 3 PROJECTS:
     - Project 1 is an AI-generated, JD-specific proposed project concept designed to demonstrate alignment with the target company's requirements.
-    - Clearly label Project 1 as a proposed concept. Never imply it has already been built, shipped, or used professionally; do not invent metrics or outcomes.
-    - Use only technologies present in the verified Master Resume skills/project catalog.
+    - Use only technologies present in the verified Master Resume skills/project catalog and if needed then add 1 or 2 from the JD.
     - Projects 2 and 3 MUST be selected from distinct verified GitHub repositories in the Master Resume, ranked by JD relevance, with their original repository links.
 4. TECHNICAL SKILLS:
    - Reorder the technologies in Backend & AI, Languages, and Cloud & Data so that the skills matching the target JD appear first in each category.
