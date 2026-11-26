@@ -20,6 +20,7 @@ interface PdfPreviewProps {
   pageCount: number;
   latexSource?: string | null;
   tailoredData?: TailoredResume | null;
+  downloadFilename?: string;
   onOpenInputTab?: () => void;
 }
 
@@ -28,6 +29,7 @@ export default function PdfPreview({
   pageCount,
   latexSource,
   tailoredData,
+  downloadFilename = "Sunny_Patel_Tailored_Resume.pdf",
   onOpenInputTab,
 }: PdfPreviewProps) {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
@@ -64,7 +66,7 @@ export default function PdfPreview({
     if (!pdfBase64) return;
     const link = document.createElement("a");
     link.href = blobUrl || `data:application/pdf;base64,${pdfBase64}`;
-    link.download = "Sunny_Patel_Tailored_Resume.pdf";
+    link.download = downloadFilename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -86,7 +88,7 @@ export default function PdfPreview({
         byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
       const byteArray = new Uint8Array(byteNumbers);
-      const file = new File([byteArray], "Sunny_Patel_Tailored_Resume.pdf", {
+      const file = new File([byteArray], downloadFilename, {
         type: "application/pdf",
       });
 

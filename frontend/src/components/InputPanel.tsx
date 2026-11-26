@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Sparkles, FileText, CheckCircle2, ArrowRight, Wand2, ShieldAlert } from "lucide-react";
+import { Sparkles, FileText, CheckCircle2, ArrowRight, Wand2, ShieldAlert, Link2 } from "lucide-react";
 
 interface InputPanelProps {
   jobDescription: string;
   setJobDescription: (val: string) => void;
+  jobUrl: string;
+  setJobUrl: (val: string) => void;
   customInstructions: string;
   setCustomInstructions: (val: string) => void;
   onTailor: () => void;
@@ -39,6 +41,8 @@ const PRESET_CHIPS = [
 export default function InputPanel({
   jobDescription,
   setJobDescription,
+  jobUrl,
+  setJobUrl,
   customInstructions,
   setCustomInstructions,
   onTailor,
@@ -97,6 +101,19 @@ Requirements:
 
       {/* Target Job Description Area */}
       <div className="flex flex-col gap-2">
+        <label htmlFor="job-url" className="text-sm font-medium text-slate-200 flex items-center gap-1.5">
+          <Link2 className="h-3.5 w-3.5 text-sky-400" />
+          <span>Job Post Link</span>
+          <span className="text-xs text-slate-400 font-normal">(Optional)</span>
+        </label>
+        <input
+          id="job-url"
+          type="url"
+          value={jobUrl}
+          onChange={(e) => setJobUrl(e.target.value)}
+          placeholder="https://company.com/careers/backend-engineer"
+          className="w-full rounded-lg border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+        />
         <div className="flex items-center justify-between">
           <label htmlFor="jd-input" className="text-sm font-medium text-slate-200 flex items-center gap-1.5">
             <span>Target Job Description (JD)</span>
@@ -168,10 +185,10 @@ Requirements:
       {/* Tailor Action Button */}
       <button
         type="button"
-        disabled={isLoading || !jobDescription.trim()}
+        disabled={isLoading || (!jobDescription.trim() && !jobUrl.trim())}
         onClick={onTailor}
         className={`relative mt-2 flex items-center justify-center gap-2 rounded-xl py-3.5 px-6 font-semibold text-sm transition-all shadow-lg cursor-pointer ${
-          isLoading || !jobDescription.trim()
+          isLoading || (!jobDescription.trim() && !jobUrl.trim())
             ? "bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50"
             : "bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white shadow-blue-900/30 hover:shadow-blue-700/40 border border-blue-400/30"
         }`}

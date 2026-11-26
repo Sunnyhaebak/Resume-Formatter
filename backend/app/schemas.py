@@ -116,7 +116,8 @@ class TailoredResumeResponse(BaseModel):
 
 
 class TailorRequest(BaseModel):
-    job_description: str = Field(..., description="Raw text of the target Job Description")
+    job_description: str = Field(default="", description="Raw text or URL of the target Job Description")
+    job_url: Optional[str] = Field(default=None, description="Optional public job-post URL to read")
     custom_instructions: Optional[str] = Field(
         default=None,
         description="Optional user guidance (e.g., 'Emphasize Spring Boot, microservices, and RAG architectures')"
@@ -129,6 +130,7 @@ class TailorRequest(BaseModel):
 
 class TailorResponse(BaseModel):
     pdf_base64: str = Field(description="Base64-encoded PDF compiled from LaTeX")
+    download_filename: str = Field(default="Sunny_Patel_Tailored_Resume.pdf", description="Suggested download filename")
     page_count: int = Field(description="Strict page count of compiled PDF (must be 1)")
     changes_summary: List[DiffItem] = Field(description="List of what was changed and why")
     tailored_data: TailoredResume = Field(description="The tailored structured resume payload")

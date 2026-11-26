@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from pypdf import PdfReader
 
-from app.main import app, load_default_master_resume, tailor_resume_endpoint, get_master_resume
+from app.main import app, load_default_master_resume, tailor_resume_endpoint, get_master_resume, build_download_filename
 from app.schemas import (
     MasterResume,
     TailoredResume,
@@ -237,6 +237,12 @@ def test_gemini_overflow_retry_includes_trim_instruction(monkeypatch):
     assert any("approximately 15%" in rule for rule in captured_payload["rules"])
     assert captured_payload["thinking_budget"] == 0
     assert captured_payload["include_thoughts"] is False
+
+
+def test_download_filename_uses_post_and_organization():
+    filename = build_download_filename("Backend Engineer", "Acme Cloud")
+
+    assert filename == "Sunny_Patel_Acme_Cloud_Backend_Engineer_Resume.pdf"
 
 
 def test_template_preserves_markdown_bold_for_experience_metrics():

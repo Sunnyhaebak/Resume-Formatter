@@ -78,6 +78,7 @@ function ResumeTailorDashboard() {
 
   // State
   const [jobDescription, setJobDescription] = useState("");
+  const [jobUrl, setJobUrl] = useState("");
   const [customInstructions, setCustomInstructions] = useState("");
   const [activeTab, setActiveTab] = useState<"input" | "diff" | "pdf">("input");
   const [isLoading, setIsLoading] = useState(false);
@@ -89,6 +90,7 @@ function ResumeTailorDashboard() {
   const [changesSummary, setChangesSummary] = useState<DiffItem[]>([]);
   const [latexSource, setLatexSource] = useState<string | null>(null);
   const [tailoredData, setTailoredData] = useState<TailoredResume | null>(null);
+  const [downloadFilename, setDownloadFilename] = useState("Sunny_Patel_Tailored_Resume.pdf");
 
   // Pre-fill from PWA Web Share Target (Android share sheet from LinkedIn/Naukri)
   useEffect(() => {
@@ -103,7 +105,7 @@ function ResumeTailorDashboard() {
   }, [searchParams]);
 
   const handleTailor = async () => {
-    if (!jobDescription.trim()) return;
+    if (!jobDescription.trim() && !jobUrl.trim()) return;
 
     setIsLoading(true);
     setErrorMsg(null);
@@ -116,6 +118,7 @@ function ResumeTailorDashboard() {
         },
         body: JSON.stringify({
           job_description: jobDescription,
+          job_url: jobUrl.trim() || null,
           custom_instructions: customInstructions || null,
         }),
       });
@@ -133,6 +136,7 @@ function ResumeTailorDashboard() {
       setChangesSummary(data.changes_summary || []);
       setLatexSource(data.latex_source || null);
       setTailoredData(data.tailored_data || null);
+      setDownloadFilename(data.download_filename || "Sunny_Patel_Tailored_Resume.pdf");
 
       // On mobile, auto-switch to preview
       if (typeof window !== "undefined" && window.innerWidth < 768) {
@@ -258,6 +262,8 @@ function ResumeTailorDashboard() {
               <InputPanel
                 jobDescription={jobDescription}
                 setJobDescription={setJobDescription}
+                jobUrl={jobUrl}
+                setJobUrl={setJobUrl}
                 customInstructions={customInstructions}
                 setCustomInstructions={setCustomInstructions}
                 onTailor={handleTailor}
@@ -302,6 +308,7 @@ function ResumeTailorDashboard() {
                   pageCount={pageCount}
                   latexSource={latexSource}
                   tailoredData={tailoredData}
+                  downloadFilename={downloadFilename}
                 />
               </div>
             </div>
@@ -315,6 +322,8 @@ function ResumeTailorDashboard() {
               <InputPanel
                 jobDescription={jobDescription}
                 setJobDescription={setJobDescription}
+                jobUrl={jobUrl}
+                setJobUrl={setJobUrl}
                 customInstructions={customInstructions}
                 setCustomInstructions={setCustomInstructions}
                 onTailor={handleTailor}
@@ -340,6 +349,7 @@ function ResumeTailorDashboard() {
                 pageCount={pageCount}
                 latexSource={latexSource}
                 tailoredData={tailoredData}
+                downloadFilename={downloadFilename}
                 onOpenInputTab={() => setActiveTab("input")}
               />
             </div>
